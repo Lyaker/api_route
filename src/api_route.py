@@ -24,7 +24,7 @@ class Coordenadas(BaseModel):
 def haversine(p1, p2):
     from math import radians, sin, cos, sqrt, atan2
 
-    R = 6371  # Raio da Terra em km
+    R = 6371  
     lat1, lon1 = p1
     lat2, lon2 = p2
 
@@ -93,10 +93,10 @@ def solve_tsp_ortools(locations):
 
     search_params = pywrapcp.DefaultRoutingSearchParameters()
 
-    # Aumentado o tempo limite
+    
     search_params.time_limit.seconds = 60
     
-    # Nova estratégia de busca inicial e meta-heurística
+    
     search_params.first_solution_strategy = (
         routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
     )
@@ -113,7 +113,7 @@ def solve_tsp_ortools(locations):
         while not routing.IsEnd(index):
             rota.append(manager.IndexToNode(index))
             index = solution.Value(routing.NextVar(index))
-        # Fecha o ciclo adicionando o ponto inicial ao final
+       
         rota.append(manager.IndexToNode(routing.End(0)))
         return rota
     else:
@@ -121,10 +121,6 @@ def solve_tsp_ortools(locations):
 
 # Função para criar matriz com OSRM
 def create_osrm_matrix(locations):
-    """
-    Cria uma matriz de tempo de viagem em segundos usando a API do OSRM.
-    Em caso de falha, faz o fallback para a matriz Haversine.
-    """
     coords_str = ";".join([f"{p[1]},{p[0]}" for p in locations])
 
     url = f"http://router.project-osrm.org/table/v1/driving/{coords_str}?sources=all&destinations=all"
@@ -145,10 +141,6 @@ def create_osrm_matrix(locations):
 
 
 def filter_points(pontos: List[Ponto], tolerance_km: float = 0.005):
-    """
-    Remove pontos duplicados ou muito próximos da lista de coordenadas.
-    A tolerância é a distância máxima (em km) para considerar dois pontos "próximos".
-    """
     if not pontos:
         return []
 
@@ -187,10 +179,10 @@ def calcular_rota(data: Coordenadas):
 
     coords = [(p.lat, p.lon) for p in pontos_filtrados]
 
-    # Chama o solver, que agora usa a matriz OSRM
+    
     rota = solve_tsp_ortools(coords)
     
-    # Para o cálculo da distância total em KM, voltamos a usar a matriz Haversine
+    
     dist_matrix_haversine = create_distance_matrix(coords)
     
     distancia_total = 0
